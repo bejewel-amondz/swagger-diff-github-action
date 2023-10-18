@@ -1,0 +1,12 @@
+name: 'Swagger diff github action'
+description: 'Send slack messages of swagger docs changes.'
+inputs:
+  source-swagger-docs-json:
+    description: 'source-swagger-docs-json'
+    required: true
+  target-swagger-docs-json:
+    description: 'target-swagger-docs-json'
+    required: true
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
