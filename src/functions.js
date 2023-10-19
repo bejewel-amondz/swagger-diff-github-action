@@ -1,4 +1,4 @@
-import { structuredPatch } from "diff";
+const { structuredPatch } = require("diff");
 
 /**
  * Get pull requests from multiple github repositories
@@ -7,11 +7,11 @@ import { structuredPatch } from "diff";
  * @param {*} repos
  * @returns
  */
-export function compareJsonsWithStructured(source, target) {
+function compareJsonsWithStructured(source, target) {
     return structuredPatch('file1.json','file2.json', JSON.stringify(source.json, null, 2), JSON.stringify(target.json, null, 2));
 }
 
-export function diffToHtml(diff) {
+function diffToHtml(diff) {
     let html = `
     <!DOCTYPE html>
     <html lang="en">
@@ -44,3 +44,8 @@ export function diffToHtml(diff) {
 
     return html;
 }
+
+module.exports = {
+    compareJsonsWithStructured,
+    diffToHtml,
+};

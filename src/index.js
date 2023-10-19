@@ -1,6 +1,6 @@
-import core from '@actions/core';
-import artifact from '@actions/artifact';
-import { compareJsonsWithStructured, diffToHtml } from "./functions.js";
+const core = require('@actions/core');
+const artifact = require('@actions/artifact');
+const { compareJsonsWithStructured, diffToHtml } = require("./functions.js");
 // import * as fs from "fs";
 
 async function main() {
