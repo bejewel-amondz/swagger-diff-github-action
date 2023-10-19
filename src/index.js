@@ -13,6 +13,9 @@ async function main() {
             required: true,
         });
         // const targetSwaggerDocsJson = JSON.parse(fs.readFileSync('./file2.json', 'utf8'));
+        const artifactName = core.getInput('artifact-name', {
+            required: true,
+        });
 
         // json 비교
         const diff = compareJsonsWithStructured({
@@ -26,7 +29,6 @@ async function main() {
         const htmlContent = diffToHtml(diff);
         const contentBuffer = Buffer.from(htmlContent, "utf-8");
 
-        const artifactName = "my-artifact";
         const fileName = "buffer-content.html";
 
         const file = {

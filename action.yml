@@ -7,6 +7,9 @@ inputs:
   target-swagger-docs-json:
     description: 'target-swagger-docs-json'
     required: true
+  artifact-name:
+    description: 'artifact-name'
+    required: true
 runs:
   using: 'node16'
   main: 'dist/index.js'
