@@ -31,8 +31,9 @@ async function main() {
         fs.writeFileSync(fileName, htmlContent);
 
 
+        const rootDirectory = '.'
         const artifactClient = artifact.create();
-        const uploadResponse = await artifactClient.uploadArtifact(artifactName, ['./' + fileName], __dirname, {
+        const uploadResponse = await artifactClient.uploadArtifact(artifactName, ['./' + fileName], rootDirectory, {
             continueOnError: false
         });
         if (uploadResponse.failedItems.length > 0) {
