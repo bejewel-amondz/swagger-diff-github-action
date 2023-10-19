@@ -1,7 +1,7 @@
+const fs = require("fs");
 const core = require('@actions/core');
 const artifact = require('@actions/artifact');
 const { compareJsonsWithStructured, diffToHtml } = require("./functions.js");
-// import * as fs from "fs";
 
 async function main() {
     try {
@@ -27,18 +27,12 @@ async function main() {
 
         // json 의 변경된 사항을 HTML 형식으로 변환하기
         const htmlContent = diffToHtml(diff);
-        const contentBuffer = Buffer.from(htmlContent, "utf-8");
+        const fileName = "json-diff.html";
+        fs.writeFileSync(fileName, htmlContent);
 
-        const fileName = "buffer-content.html";
-
-        const file = {
-            path: fileName,
-            size: contentBuffer.length,
-            file: contentBuffer
-        };
 
         const artifactClient = artifact.create();
-        const uploadResponse = await artifactClient.uploadArtifact(artifactName, [file], __dirname, {
+        const uploadResponse = await artifactClient.uploadArtifact(artifactName, ['./' + fileName], __dirname, {
             continueOnError: false
         });
         if (uploadResponse.failedItems.length > 0) {
