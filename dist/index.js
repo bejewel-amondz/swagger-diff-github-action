@@ -35126,15 +35126,8 @@ function wrappy (fn, cb) {
 
 const { structuredPatch } = __nccwpck_require__(1672);
 
-/**
- * Get pull requests from multiple github repositories
- * @param {*} source
- * @param {*} target
- * @param {*} repos
- * @returns
- */
-function compareJsonsWithStructured(source, target) {
-    return structuredPatch('file1.json','file2.json', JSON.stringify(source.json, null, 2), JSON.stringify(target.json, null, 2));
+function compareJsonsWithStructured(sourceJson, targetJson) {
+    return structuredPatch('file1.json','file2.json', JSON.stringify(sourceJson, null, 2), JSON.stringify(targetJson, null, 2));
 }
 
 function diffToHtml(diff) {
@@ -35454,34 +35447,29 @@ async function main() {
         const sourceSwaggerDocsJson = core.getInput('source-swagger-docs-json', {
             required: true,
         });
-        // const sourceSwaggerDocsJson = JSON.parse(fs.readFileSync('./file1.json', 'utf8'));
         const targetSwaggerDocsJson = core.getInput('target-swagger-docs-json', {
             required: true,
         });
-        // const targetSwaggerDocsJson = JSON.parse(fs.readFileSync('./file2.json', 'utf8'));
         const artifactName = core.getInput('artifact-name', {
             required: true,
         });
 
         // json 비교
-        const diff = compareJsonsWithStructured({
-            json: sourceSwaggerDocsJson
-        }, {
-                json: targetSwaggerDocsJson
-            }
-            );
+        const diff = compareJsonsWithStructured(sourceSwaggerDocsJson, targetSwaggerDocsJson);
 
         // json 의 변경된 사항을 HTML 형식으로 변환하기
         const htmlContent = diffToHtml(diff);
+
         const fileName = "json-diff.html";
         fs.writeFileSync(fileName, htmlContent);
 
-
         const rootDirectory = '.'
+        const filePath = './' + fileName;
         const artifactClient = artifact.create();
-        const uploadResponse = await artifactClient.uploadArtifact(artifactName, ['./' + fileName], rootDirectory, {
+        const uploadResponse = await artifactClient.uploadArtifact(artifactName, [filePath], rootDirectory, {
             continueOnError: false
         });
+
         if (uploadResponse.failedItems.length > 0) {
             core.setFailed('Some items failed to upload');
         } else {

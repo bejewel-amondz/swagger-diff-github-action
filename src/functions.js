@@ -1,14 +1,7 @@
 const { structuredPatch } = require("diff");
 
-/**
- * Get pull requests from multiple github repositories
- * @param {*} source
- * @param {*} target
- * @param {*} repos
- * @returns
- */
-function compareJsonsWithStructured(source, target) {
-    return structuredPatch('file1.json','file2.json', JSON.stringify(source.json, null, 2), JSON.stringify(target.json, null, 2));
+function compareJsonsWithStructured(sourceJson, targetJson) {
+    return structuredPatch('file1.json','file2.json', JSON.stringify(sourceJson, null, 2), JSON.stringify(targetJson, null, 2));
 }
 
 function diffToHtml(diff) {
