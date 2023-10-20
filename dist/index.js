@@ -35138,7 +35138,7 @@ function diffToHtml(diff) {
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>버전 비교</title>
+        <title>swagger docs 버전 비교</title>
          <style>            
             .line {
                 background-color: #f6f8fa;
@@ -35166,7 +35166,7 @@ function diffToHtml(diff) {
     if (diff.hunks.length === 0) {
         html += '<h1 style="text-align: center;"><strong>변경된 사항이 없습니다.</strong></h1>'
     } else {
-        html += '<h1 style="text-align: center;"><strong>v3.0.0 버전에서의 변경사항입니다.</strong></h1>'
+        html += '<h1 style="text-align: center;"><strong>변경사항은 아래와 같습니다.</strong></h1>'
 
         diff.hunks.forEach(hunk => {
             html += '<div class="line">';
