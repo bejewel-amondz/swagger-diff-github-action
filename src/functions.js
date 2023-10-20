@@ -1,7 +1,7 @@
 const { structuredPatch } = require("diff");
 
 function compareJsonsWithStructured(sourceJson, targetJson) {
-    return structuredPatch('file1.json','file2.json', JSON.stringify(sourceJson, null, 2), JSON.stringify(targetJson, null, 2));
+    return structuredPatch('sourceJson','targetJson', JSON.stringify(sourceJson, null, 2), JSON.stringify(targetJson, null, 2));
 }
 
 function diffToHtml(diff) {
@@ -12,26 +12,53 @@ function diffToHtml(diff) {
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>JSON Diff</title>
+        <title>버전 비교</title>
+         <style>            
+            .line {
+                background-color: #f6f8fa;
+                padding: 10px;
+                border: 1px solid #ddd;
+                margin-bottom: 10px;
+            }
+            
+            .num {
+                display: inline-block;
+                min-width: 30px;
+                color: #868e96;
+                margin-right: 5px;
+            }
+            
+            .content {
+                white-space: pre-wrap;
+            }
+        </style>
     </head>
     <body>
     <div style="font-family: monospace;">
     `;
 
-    diff.hunks.forEach(hunk => {
-        html += `<div><strong>file1.json 의 Lines ${hunk.oldStart}-${hunk.oldStart + hunk.oldLines - 1}:</strong></div>`;
-        html += '<div style="background-color: #f6f8fa; padding: 10px; border: 1px solid #ddd; margin-bottom: 10px;">';
-        hunk.lines.forEach(line => {
-            if (line.startsWith('-')) {
-                html += `<div style="color: red;">${line}</div>`;
-            } else if (line.startsWith('+')) {
-                html += `<div style="color: green;">${line}</div>`;
-            } else {
-                html += `<div style="color: grey;">${line}</div>`;
-            }
+    if (diff.hunks.length === 0) {
+        html += '<h1 style="text-align: center;"><strong>변경된 사항이 없습니다.</strong></h1>'
+    } else {
+        html += '<h1 style="text-align: center;"><strong>v3.0.0 버전에서의 변경사항입니다.</strong></h1>'
+
+        diff.hunks.forEach(hunk => {
+            html += '<div class="line">';
+
+            let lineNum = hunk.oldStart - 1;
+            hunk.lines.forEach(line => {
+                if (line.startsWith('-')) {
+                    html += `<div><div class="num">${++lineNum}</div><span class="content" style="color: red;">${line}</span></div>`;
+                } else if (line.startsWith('+')) {
+                    html += `<div><div class="num"></div><span class="content" style="color: green;">${line}</span></div>`;
+                } else {
+                    html += `<div><div class="num">${++lineNum}</div><span class="content" style="color: grey;">${line}</span></div>`;
+                }
+            });
+
+            html += '</div>';
         });
-        html += '</div>';
-    });
+    }
 
     html += '</div></body></html>';
 
