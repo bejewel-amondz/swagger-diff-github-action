@@ -1,7 +1,7 @@
 const { structuredPatch } = require("diff");
 
 function compareJsonsWithStructured(sourceJson, targetJson) {
-    return structuredPatch('sourceJson','targetJson', JSON.stringify(sourceJson, null, 2), JSON.stringify(targetJson, null, 2));
+    return structuredPatch('sourceJson','targetJson', JSON.stringify(sourceJson, null, 2).trim(), JSON.stringify(targetJson, null, 2).trim());
 }
 
 function diffToHtml(diff) {
