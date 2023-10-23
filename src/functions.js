@@ -1,4 +1,28 @@
+const fs = require("fs");
+const core = require('@actions/core');
+const artifact = require('@actions/artifact');
 const { structuredPatch } = require("diff");
+
+function readSwaggerDocsFromFilePath(filePath) {
+    if (!fs.existsSync(filePath)) {
+        core.setFailed(`File not found: ${filePath}`);
+        return null;
+    }
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
+
+async function uploadArtifact(artifactName, filePath) {
+    const rootDirectory = '.';
+    const artifactClient = artifact.create();
+    const uploadResponse = await artifactClient.uploadArtifact(artifactName, [filePath], rootDirectory, {
+        continueOnError: false
+    });
+    if (uploadResponse.failedItems.length > 0) {
+        core.setFailed('Some items failed to upload');
+    } else {
+        core.info('Artifact uploaded successfully');
+    }
+}
 
 function compareJsonsWithStructured(sourceJson, targetJson) {
     return structuredPatch(
@@ -71,6 +95,8 @@ function diffToHtml(diff) {
 }
 
 module.exports = {
+    readSwaggerDocsFromFilePath,
+    uploadArtifact,
     compareJsonsWithStructured,
     diffToHtml,
 };

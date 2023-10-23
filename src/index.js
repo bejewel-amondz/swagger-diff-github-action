@@ -1,29 +1,19 @@
 const fs = require("fs");
 const core = require('@actions/core');
-const artifact = require('@actions/artifact');
-const { compareJsonsWithStructured, diffToHtml } = require("./functions.js");
+const { readSwaggerDocsFromFilePath, compareJsonsWithStructured, diffToHtml, uploadArtifact } = require("./functions.js");
 
 async function main() {
     try {
-        let sourceSwaggerDocsJson;
-        let targetSwaggerDocsJson;
         const sourceSwaggerDocsJsonFilePath = core.getInput('source-swagger-docs-json-file-path', {
             required: true,
         });
-        if (fs.existsSync(sourceSwaggerDocsJsonFilePath)) {
-            sourceSwaggerDocsJson = JSON.parse(fs.readFileSync(sourceSwaggerDocsJsonFilePath, 'utf8'));
-        } else {
-            core.setFailed(`File not found: ${sourceSwaggerDocsJsonFilePath}`);
-        }
+        const sourceSwaggerDocsJson = await readSwaggerDocsFromFilePath(sourceSwaggerDocsJsonFilePath);
 
         const targetSwaggerDocsJsonFilePath = core.getInput('target-swagger-docs-json-file-path', {
             required: true,
         });
-        if (fs.existsSync(targetSwaggerDocsJsonFilePath)) {
-            targetSwaggerDocsJson = JSON.parse(fs.readFileSync(targetSwaggerDocsJsonFilePath, 'utf8'));
-        } else {
-            core.setFailed(`File not found: ${targetSwaggerDocsJsonFilePath}`);
-        }
+        const targetSwaggerDocsJson = await readSwaggerDocsFromFilePath(targetSwaggerDocsJsonFilePath);
+
 
         const artifactName = core.getInput('artifact-name', {
             required: true,
@@ -38,18 +28,7 @@ async function main() {
         const fileName = "json-diff.html";
         fs.writeFileSync(fileName, htmlContent);
 
-        const rootDirectory = '.'
-        const filePath = './' + fileName;
-        const artifactClient = artifact.create();
-        const uploadResponse = await artifactClient.uploadArtifact(artifactName, [filePath], rootDirectory, {
-            continueOnError: false
-        });
-
-        if (uploadResponse.failedItems.length > 0) {
-            core.setFailed('Some items failed to upload');
-        } else {
-            core.info('Artifact uploaded successfully');
-        }
+        await uploadArtifact(artifactName, `./${fileName}`);
 
     } catch (error) {
         console.error(error);

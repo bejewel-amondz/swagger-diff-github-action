@@ -35124,7 +35124,31 @@ function wrappy (fn, cb) {
 /***/ 4587:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+const fs = __nccwpck_require__(7147);
+const core = __nccwpck_require__(2186);
+const artifact = __nccwpck_require__(2605);
 const { structuredPatch } = __nccwpck_require__(1672);
+
+function readSwaggerDocsFromFilePath(filePath) {
+    if (!fs.existsSync(filePath)) {
+        core.setFailed(`File not found: ${filePath}`);
+        return null;
+    }
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
+
+async function uploadArtifact(artifactName, filePath) {
+    const rootDirectory = '.';
+    const artifactClient = artifact.create();
+    const uploadResponse = await artifactClient.uploadArtifact(artifactName, [filePath], rootDirectory, {
+        continueOnError: false
+    });
+    if (uploadResponse.failedItems.length > 0) {
+        core.setFailed('Some items failed to upload');
+    } else {
+        core.info('Artifact uploaded successfully');
+    }
+}
 
 function compareJsonsWithStructured(sourceJson, targetJson) {
     return structuredPatch(
@@ -35197,6 +35221,8 @@ function diffToHtml(diff) {
 }
 
 module.exports = {
+    readSwaggerDocsFromFilePath,
+    uploadArtifact,
     compareJsonsWithStructured,
     diffToHtml,
 };
@@ -35471,30 +35497,20 @@ var __webpack_exports__ = {};
 (() => {
 const fs = __nccwpck_require__(7147);
 const core = __nccwpck_require__(2186);
-const artifact = __nccwpck_require__(2605);
-const { compareJsonsWithStructured, diffToHtml } = __nccwpck_require__(4587);
+const { readSwaggerDocsFromFilePath, compareJsonsWithStructured, diffToHtml, uploadArtifact } = __nccwpck_require__(4587);
 
 async function main() {
     try {
-        let sourceSwaggerDocsJson;
-        let targetSwaggerDocsJson;
         const sourceSwaggerDocsJsonFilePath = core.getInput('source-swagger-docs-json-file-path', {
             required: true,
         });
-        if (fs.existsSync(sourceSwaggerDocsJsonFilePath)) {
-            sourceSwaggerDocsJson = JSON.parse(fs.readFileSync(sourceSwaggerDocsJsonFilePath, 'utf8'));
-        } else {
-            core.setFailed(`File not found: ${sourceSwaggerDocsJsonFilePath}`);
-        }
+        const sourceSwaggerDocsJson = await readSwaggerDocsFromFilePath(sourceSwaggerDocsJsonFilePath);
 
         const targetSwaggerDocsJsonFilePath = core.getInput('target-swagger-docs-json-file-path', {
             required: true,
         });
-        if (fs.existsSync(targetSwaggerDocsJsonFilePath)) {
-            targetSwaggerDocsJson = JSON.parse(fs.readFileSync(targetSwaggerDocsJsonFilePath, 'utf8'));
-        } else {
-            core.setFailed(`File not found: ${targetSwaggerDocsJsonFilePath}`);
-        }
+        const targetSwaggerDocsJson = await readSwaggerDocsFromFilePath(targetSwaggerDocsJsonFilePath);
+
 
         const artifactName = core.getInput('artifact-name', {
             required: true,
@@ -35509,18 +35525,7 @@ async function main() {
         const fileName = "json-diff.html";
         fs.writeFileSync(fileName, htmlContent);
 
-        const rootDirectory = '.'
-        const filePath = './' + fileName;
-        const artifactClient = artifact.create();
-        const uploadResponse = await artifactClient.uploadArtifact(artifactName, [filePath], rootDirectory, {
-            continueOnError: false
-        });
-
-        if (uploadResponse.failedItems.length > 0) {
-            core.setFailed('Some items failed to upload');
-        } else {
-            core.info('Artifact uploaded successfully');
-        }
+        await uploadArtifact(artifactName, `./${fileName}`);
 
     } catch (error) {
         console.error(error);
