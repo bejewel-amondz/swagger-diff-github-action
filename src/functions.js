@@ -6,11 +6,6 @@ function compareJsonsWithStructured(sourceJson, targetJson) {
         'targetJson',
         JSON.stringify(sourceJson, null, 2),
         JSON.stringify(targetJson, null, 2),
-        'sourceJson',
-        'targetJson',
-        {
-            ignoreWhitespace: true,
-        }
     );
 }
 

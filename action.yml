@@ -1,11 +1,11 @@
 name: 'Swagger diff github action'
 description: 'Send slack messages of swagger docs changes.'
 inputs:
-  source-swagger-docs-json:
-    description: 'source-swagger-docs-json'
+  source-swagger-docs-json-file-path:
+    description: 'source-swagger-docs-json-file-path'
     required: true
-  target-swagger-docs-json:
-    description: 'target-swagger-docs-json'
+  target-swagger-docs-json-file-path:
+    description: 'target-swagger-docs-json-file-path'
     required: true
   artifact-name:
     description: 'artifact-name'

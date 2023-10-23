@@ -35132,11 +35132,6 @@ function compareJsonsWithStructured(sourceJson, targetJson) {
         'targetJson',
         JSON.stringify(sourceJson, null, 2),
         JSON.stringify(targetJson, null, 2),
-        'sourceJson',
-        'targetJson',
-        {
-            ignoreWhitespace: true,
-        }
     );
 }
 
@@ -35481,12 +35476,26 @@ const { compareJsonsWithStructured, diffToHtml } = __nccwpck_require__(4587);
 
 async function main() {
     try {
-        const sourceSwaggerDocsJson = core.getInput('source-swagger-docs-json', {
+        let sourceSwaggerDocsJson;
+        let targetSwaggerDocsJson;
+        const sourceSwaggerDocsJsonFilePath = core.getInput('source-swagger-docs-json-file-path', {
             required: true,
         });
-        const targetSwaggerDocsJson = core.getInput('target-swagger-docs-json', {
+        if (fs.existsSync(sourceSwaggerDocsJsonFilePath)) {
+            sourceSwaggerDocsJson = JSON.parse(fs.readFileSync(sourceSwaggerDocsJsonFilePath, 'utf8'));
+        } else {
+            core.setFailed(`File not found: ${sourceSwaggerDocsJsonFilePath}`);
+        }
+
+        const targetSwaggerDocsJsonFilePath = core.getInput('target-swagger-docs-json-file-path', {
             required: true,
         });
+        if (fs.existsSync(targetSwaggerDocsJsonFilePath)) {
+            targetSwaggerDocsJson = JSON.parse(fs.readFileSync(targetSwaggerDocsJsonFilePath, 'utf8'));
+        } else {
+            core.setFailed(`File not found: ${targetSwaggerDocsJsonFilePath}`);
+        }
+
         const artifactName = core.getInput('artifact-name', {
             required: true,
         });
