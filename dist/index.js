@@ -35133,7 +35133,7 @@ function compareJsonsWithStructured(sourceJson, targetJson) {
         JSON.stringify(sourceJson, null, 2),
         JSON.stringify(targetJson, null, 2),
         {
-            ignoreWhitespace: true,
+            newlineIsToken: true,
         }
     );
 }
