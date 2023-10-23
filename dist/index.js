@@ -35192,28 +35192,24 @@ function diffToHtml(diff) {
     <div style="font-family: monospace;">
     `;
 
-    if (diff.hunks.length === 0) {
-        html += '<h1 style="text-align: center;"><strong>변경된 사항이 없습니다.</strong></h1>'
-    } else {
-        html += '<h1 style="text-align: center;"><strong>변경사항은 아래와 같습니다.</strong></h1>'
+    html += '<h1 style="text-align: center;"><strong>변경사항은 아래와 같습니다.</strong></h1>'
 
-        diff.hunks.forEach(hunk => {
-            html += '<div class="line">';
+    diff.hunks.forEach(hunk => {
+        html += '<div class="line">';
 
-            let lineNum = hunk.oldStart - 1;
-            hunk.lines.forEach(line => {
-                if (line.startsWith('-')) {
-                    html += `<div><div class="num">${++lineNum}</div><span class="content" style="color: red;">${line}</span></div>`;
-                } else if (line.startsWith('+')) {
-                    html += `<div><div class="num"></div><span class="content" style="color: green;">${line}</span></div>`;
-                } else {
-                    html += `<div><div class="num">${++lineNum}</div><span class="content" style="color: grey;">${line}</span></div>`;
-                }
-            });
-
-            html += '</div>';
+        let lineNum = hunk.oldStart - 1;
+        hunk.lines.forEach(line => {
+            if (line.startsWith('-')) {
+                html += `<div><div class="num">${++lineNum}</div><span class="content" style="color: red;">${line}</span></div>`;
+            } else if (line.startsWith('+')) {
+                html += `<div><div class="num"></div><span class="content" style="color: green;">${line}</span></div>`;
+            } else {
+                html += `<div><div class="num">${++lineNum}</div><span class="content" style="color: grey;">${line}</span></div>`;
+            }
         });
-    }
+
+        html += '</div>';
+    });
 
     html += '</div></body></html>';
 
@@ -35511,13 +35507,19 @@ async function main() {
         });
         const targetSwaggerDocsJson = await readSwaggerDocsFromFilePath(targetSwaggerDocsJsonFilePath);
 
-
         const artifactName = core.getInput('artifact-name', {
             required: true,
         });
 
         // json 비교
         const diff = compareJsonsWithStructured(sourceSwaggerDocsJson, targetSwaggerDocsJson);
+
+        if (diff.hunks.length === 0) {
+            core.setOutput('hasChanges', 'false');
+            return;
+        }
+
+        core.setOutput('hasChanges', 'true');
 
         // json 의 변경된 사항을 HTML 형식으로 변환하기
         const htmlContent = diffToHtml(diff);
