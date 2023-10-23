@@ -35127,7 +35127,15 @@ function wrappy (fn, cb) {
 const { structuredPatch } = __nccwpck_require__(1672);
 
 function compareJsonsWithStructured(sourceJson, targetJson) {
-    return structuredPatch('sourceJson','targetJson', JSON.stringify(sourceJson, null, 2).trim(), JSON.stringify(targetJson, null, 2).trim());
+    return structuredPatch(
+        'sourceJson',
+        'targetJson',
+        JSON.stringify(sourceJson, null, 2),
+        JSON.stringify(targetJson, null, 2),
+        {
+            ignoreWhitespace: true,
+        }
+    );
 }
 
 function diffToHtml(diff) {
